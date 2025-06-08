@@ -323,10 +323,21 @@ class ResearchConductor:
 
         # Using asyncio.gather to process the sub_queries asynchronously
         try:
+            # context = await asyncio.gather(
+            #     *[
+            #         self._process_sub_query(sub_query, scraped_data, query_domains)
+            #         for sub_query in sub_queries
+            #     ]
+            # )
             context = await asyncio.gather(
                 *[
-                    self._process_sub_query(sub_query, scraped_data, query_domains)
+                    self._process_sub_query(
+                        str(item) if not isinstance(item, str) else item,
+                        scraped_data,
+                        query_domains
+                    )
                     for sub_query in sub_queries
+                    for item in (sub_query if isinstance(sub_query, list) else [sub_query])
                 ]
             )
             self.logger.info(f"Gathered context from {len(context)} sub-queries")
